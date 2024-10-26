@@ -10,7 +10,7 @@ using Florea_Daniel_Lab2.Models;
 
 namespace Florea_Daniel_Lab2.Pages.Books
 {
-    public class IndexModel : PageModel
+    public class IndexModel : BookCategoriesPageModel
     {
         private readonly Florea_Daniel_Lab2.Data.Florea_Daniel_Lab2Context _context;
 
@@ -19,14 +19,34 @@ namespace Florea_Daniel_Lab2.Pages.Books
             _context = context;
         }
 
-        public IList<Book> Book { get;set; } = default!;
+        public IList<Book> Book { get;set; }
+        public BookData BookD { get; set; }
+        public int BookID { get; set; }
+        public int CategoryID { get; set; }
 
-        public async Task OnGetAsync()
+        public async Task OnGetAsync(int? id, int? categoryID)
         {
-            Book = await _context.Book
+            BookD = new BookData();
+            BookD.Books = await _context.Book
+             .Include(b => b.Publisher)
+             .Include(b => b.Author)
+             .Include(b => b.BookCategories)
+             .ThenInclude(b => b.Category)
+             .AsNoTracking()
+             .OrderBy(b => b.Title)
+             .ToListAsync();
+
+            if (id != null)
+            {
+                BookID = id.Value;
+                Book book = BookD.Books
+                .Where(i => i.ID == id.Value).Single();
+                BookD.Categories = book.BookCategories.Select(s => s.Category);
+            }
+            /*Book = await _context.Book
                 .Include(b => b.Publisher)
                 .Include(b => b.Author)
-                .ToListAsync();
+                .ToListAsync();*/
         }
     }
 }

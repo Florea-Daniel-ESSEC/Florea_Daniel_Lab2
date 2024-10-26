@@ -7,11 +7,10 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Florea_Daniel_Lab2.Data;
 using Florea_Daniel_Lab2.Models;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace Florea_Daniel_Lab2.Pages.Books
+namespace Florea_Daniel_Lab2.Pages.Categories
 {
-    public class DetailsModel : BookCategoriesPageModel
+    public class DetailsModel : PageModel
     {
         private readonly Florea_Daniel_Lab2.Data.Florea_Daniel_Lab2Context _context;
 
@@ -20,7 +19,7 @@ namespace Florea_Daniel_Lab2.Pages.Books
             _context = context;
         }
 
-        public Book Book { get; set; } = default!;
+        public Category Category { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -29,22 +28,14 @@ namespace Florea_Daniel_Lab2.Pages.Books
                 return NotFound();
             }
 
-            var book = await _context.Book
-                .Include(b => b.Publisher)
-                .Include(b => b.Author)
-                .Include(b => b.BookCategories)
-                .ThenInclude(b => b.Category)
-                .AsNoTracking()
-                .OrderBy(b => b.Title)
-                .FirstOrDefaultAsync(m => m.ID == id);
-
-            if (book == null)
+            var category = await _context.Category.FirstOrDefaultAsync(m => m.ID == id);
+            if (category == null)
             {
                 return NotFound();
             }
             else
             {
-                Book = book;
+                Category = category;
             }
             return Page();
         }
