@@ -10,7 +10,7 @@ using Florea_Daniel_Lab2.Models;
 
 namespace Florea_Daniel_Lab2.Pages.Books
 {
-    public class DeleteModel : PageModel
+    public class DeleteModel : BookCategoriesPageModel
     {
         private readonly Florea_Daniel_Lab2.Data.Florea_Daniel_Lab2Context _context;
 
@@ -29,7 +29,13 @@ namespace Florea_Daniel_Lab2.Pages.Books
                 return NotFound();
             }
 
-            var book = await _context.Book.Include(b => b.Publisher).Include(b => b.Author).FirstOrDefaultAsync(m => m.ID == id);
+            var book = await _context.Book
+                .Include(b => b.Publisher)
+                .Include(b => b.Author)
+                .Include(b => b.BookCategories)
+                .ThenInclude(b => b.Category)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.ID == id);
 
             if (book == null)
             {
